@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# HOLA ESTE ES UN CAMBIO
+# Hi There!
 # You may be wondering what this giant blob of binary data here is, you might
 # even be worried that we're up to something nefarious (good for you for being
 # paranoid!). This is a base85 encoding of a zip file, this zip file contains
