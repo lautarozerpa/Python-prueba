@@ -1,140 +1,172 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
+import PySimpleGUI as sg
+import random
 from pattern.web import Wiktionary as wik
 from pattern.es import verbs, tag, spelling, lexicon
 import string
-import json,os
+import json, os
 import unicodedata
-import PySimpleGUI as sg
-import random
+
 
 def elimina_tildes(cadena):
-    s = ''.join((c for c in unicodedata.normalize('NFD',cadena) if unicodedata.category(c) != 'Mn'))
+    s = ''.join((c for c in unicodedata.normalize('NFD', cadena) if unicodedata.category(c) != 'Mn'))
     return s
-    
+
+
 def limpiarOracion(Oracion):
-	sinacentos=elimina_tildes(Oracion)
-	sacareditar=sinacentos.replace("[editar]","")
-	sacarene=sacareditar.replace("\\n","")
-	sacaretimologia=sacarene.replace("Etimologia","")
-	return sacaretimologia
+    sinacentos = elimina_tildes(Oracion)
+    sacareditar = sinacentos.replace("[editar]", "")
+    sacarene = sacareditar.replace("\\n", "")
+    sacaretimologia = sacarene.replace("Etimologia", "")
+    return sacaretimologia
+
 
 def BuscarEnWiki(palabra):
-	engine=wik(language='es')
-	#SELECCIONA LA PALABRA A BUSCAR
-	article=engine.article(palabra)
+    engine = wik(language='es')
+    # SELECCIONA LA PALABRA A BUSCAR
+    article = engine.article(palabra)
 
-	try:
-		#BUSCA SI ES SUST,ADJ,VERB EN WIKI Y LO GUARDA EN tipowiki
-		for section in article.sections:
-			if ("SUSTANTIV") in(repr(section)).upper():
-				tipowiki="Sustantivo"
-				break
-			elif("ADJETIV") in repr(section).upper():
-				tipowiki="Adjetivo"
-				break
-			elif("VERB") in repr(section).upper():
-				tipowiki="Verbo"
-				break
-				
-	#EXCEPCION POR SI NO ENCUENTRA LA PALABRA
-	except (TypeError, AttributeError):
-		tipowiki=""
-		print("La palabra no esta en Wiktionary")
-	return tipowiki
-	
+    try:
+        # BUSCA SI ES SUST,ADJ,VERB EN WIKI Y LO GUARDA EN tipowiki
+        for section in article.sections:
+            if ("SUSTANTIV") in (repr(section)).upper():
+                tipowiki = "Sustantivo"
+                break
+            elif ("ADJETIV") in repr(section).upper():
+                tipowiki = "Adjetivo"
+                break
+            elif ("VERB") in repr(section).upper():
+                tipowiki = "Verbo"
+                break
+
+    # EXCEPCION POR SI NO ENCUENTRA LA PALABRA
+    except (TypeError, AttributeError):
+        tipowiki = ""
+        print("La palabra no esta en Wiktionary")
+    return tipowiki
+
+
 def BuscarEnPattern(palabra):
-	def clasificar(palabra):
-		#if ("NN") in ( tag(palabra,tokenize=True, encoding='utf-8')):
-		if((tag(palabra,tokenize=True, encoding='utf-8')[0][1])== "NN"):
-			tipopattern="Sustantivo"
-		elif((tag(palabra,tokenize=True, encoding='utf-8')[0][1])== "JJ"):
-			tipopattern="Adjetivo"
-		elif((tag(palabra,tokenize=True, encoding='utf-8')[0][1])== "VB"):
-			tipopattern="Verbo"
-		else:
-			tipopattern=""
-		return tipopattern
-	if not palabra.lower() in verbs:
-		if not palabra.lower() in spelling:
-			if (not(palabra.lower() in lexicon) and not(palabra.upper() in lexicon) and not(palabra.capitalize() in lexicon)):
-				print('La palabra no esta en pattern.es')
-				tipopattern=""
-			else:
-				tipopattern=clasificar(palabra)
-		else:
-			tipopattern=clasificar(palabra)
-	else:
-		tipopattern=clasificar(palabra)
-				
-	print()
-	return tipopattern
+    def clasificar(palabra):
+        # if ("NN") in ( tag(palabra,tokenize=True, encoding='utf-8')):
+        if ((tag(palabra, tokenize=True, encoding='utf-8')[0][1]) == "NN"):
+            tipopattern = "Sustantivo"
+        elif ((tag(palabra, tokenize=True, encoding='utf-8')[0][1]) == "JJ"):
+            tipopattern = "Adjetivo"
+        elif ((tag(palabra, tokenize=True, encoding='utf-8')[0][1]) == "VB"):
+            tipopattern = "Verbo"
+        else:
+            tipopattern = ""
+        return tipopattern
+
+    if not palabra.lower() in verbs:
+        if not palabra.lower() in spelling:
+            if (not (palabra.lower() in lexicon) and not (palabra.upper() in lexicon) and not (
+                    palabra.capitalize() in lexicon)):
+                print('La palabra no esta en pattern.es')
+                tipopattern = ""
+            else:
+                tipopattern = clasificar(palabra)
+        else:
+            tipopattern = clasificar(palabra)
+    else:
+        tipopattern = clasificar(palabra)
+
+    print()
+    return tipopattern
+
 
 def BuscarDefinicionEnWiki(palabra):
-	engine=wik(language='es')
-	article=engine.article(palabra)
+	engine = wik(language='es')
+	article = engine.article(palabra)
 	for section in article.sections:
 		if ("Etimolog") in repr(section):
-			contenido=(repr(section.content))
+			contenido = (repr(section.content))
+		else:
+			contenido=" "
 	return limpiarOracion(contenido)
 
 
-def GuardarDatos(palabra,tipo,definicion):
-	datonuevo={}
-	datonuevo.setdefault("Palabra",palabra)
-	datonuevo.setdefault("Tipo",tipo)
-	datonuevo.setdefault("Definicion",definicion)
-	if os.path.isfile("Palabras.json"):  
-		with open("Palabras.json", mode='r') as f: 
-			data = json.loads(f.read())
-		f.close()
-		data.append(datonuevo)
-		with open("Palabras.json",'w') as f:
-			json.dump(data,f,indent=4)
-	else:
-		data=[datonuevo]
-		with open("Palabras.json","w")as f:
-			json.dump(data,f,indent=4)
-			
-def ReportePatternTipo(palabra,tipo):
-	Log="La palabra " + palabra + " no se encuentra en pattern como un " + tipo
-	f = open('LogPattern.txt','a')
-	f.write('\n' + Log)
-	f.close()
+def GuardarDatos(palabra, tipo, definicion):
+    datonuevo = {}
+    datonuevo.setdefault("Palabra", palabra)
+    datonuevo.setdefault("Tipo", tipo)
+    datonuevo.setdefault("Definicion", definicion)
+    if os.path.isfile("Palabras.json"):
+        with open("Palabras.json", mode='r') as f:
+            data = json.loads(f.read())
+        f.close()
+        data.append(datonuevo)
+        with open("Palabras.json", 'w') as f:
+            json.dump(data, f, indent=4)
+    else:
+        data = [datonuevo]
+        with open("Palabras.json", "w")as f:
+            json.dump(data, f, indent=4)
+
+
+def ReportePatternTipo(palabra, tipo):
+    Log = "La palabra " + palabra + " no se encuentra en pattern como un " + tipo
+    f = open('LogPattern.txt', 'a')
+    f.write('\n' + Log)
+    f.close()
+
 
 def ReportePatternYWiki(palabra):
-	Log="La palabra " + palabra + " no se encuentra en pattern ni en wiktionary"
-	f = open('LogPatternYWiki.txt','a')
-	f.write('\n' + Log)
-	f.close()
-
-def ComprobarPalabra(palabra):
-	tipoWiki=BuscarEnWiki(palabra.lower())
-	tipoPattern=BuscarEnPattern(palabra)
-	if (tipoWiki!= ""):
-		if(tipoPattern!=""):
-			#Si wiki y pattern son iguales, se guarda
-			if(tipoWiki==tipoPattern):
-				definicion=BuscarDefinicionEnWiki(palabra.lower())
-				GuardarDatos(palabra,tipoWiki,definicion)
-			#Si wiki y pattern son distintas, se toma la de wiki y se hace reporte en pattern
-			else:
-				definicion=BuscarDefinicionEnWiki(palabra.lower())
-				GuardarDatos(palabra,tipoWiki,definicion)
-				ReportePatternTipo(palabra,tipoWiki)
-		else:
-			definicion=BuscarDefinicionEnWiki(palabra.lower())
-			GuardarDatos(palabra,tipoWiki,definicion)
-			ReportePatternTipo(palabra,tipoWiki)
-	elif(tipoPattern!=""): #Si no esta en wiki pero si esta en pattern se pide la definicion al profesor y se guarda
-		definicion=input(print("Ingrese definicion de la palabra"))
-		GuardarDatos(palabra,tipoPattern,definicion)
-	else:
-		ReportePatternYWiki(palabra)
+    Log = "La palabra " + palabra + " no se encuentra en pattern ni en wiktionary"
+    f = open('LogPatternYWiki.txt', 'a')
+    f.write('\n' + Log)
+    f.close()
 
 
-def Opciones(oficinas,lista_colores):
+def main_comprobacion_palabra(palabra):
+    tipoWiki = BuscarEnWiki(palabra.lower())
+    tipoPattern = BuscarEnPattern(palabra)
+    if (tipoWiki != ""):
+        if (tipoPattern != ""):
+            # Si wiki y pattern son iguales, se guarda
+            if (tipoWiki == tipoPattern):
+                definicion = BuscarDefinicionEnWiki(palabra.lower())
+                GuardarDatos(palabra, tipoWiki, definicion)
+            # Si wiki y pattern son distintas, se toma la de wiki y se hace reporte en pattern
+            else:
+                definicion = BuscarDefinicionEnWiki(palabra.lower())
+                GuardarDatos(palabra, tipoWiki, definicion)
+                ReportePatternTipo(palabra, tipoWiki)
+        else:
+            definicion = BuscarDefinicionEnWiki(palabra.lower())
+            GuardarDatos(palabra, tipoWiki, definicion)
+            ReportePatternTipo(palabra, tipoWiki)
+    elif (
+            tipoPattern != ""):  # Si no esta en wiki pero si esta en pattern se pide la definicion al profesor y se guarda
+        definicion = input(print("Ingrese definicion de la palabra"))
+        GuardarDatos(palabra, tipoPattern, definicion)
+    else:
+        ReportePatternYWiki(palabra)
+
+def buscar_oficinas():
+    arc = open('datos-oficinas.json', 'r')
+    data= json.load(arc)
+    lista=[]
+    for x in data:
+        lista.append(x)
+    arc.close()
+    return lista
+
+
+def calcular_promedio(ofi):
+    arc = open('datos-oficinas.json', 'r')
+    data = json.load(arc)
+    data= data[ofi]
+    suma=0
+    cant_sumas=0
+    for elem in data:
+        cant_sumas= cant_sumas +1
+        suma = suma + elem['temp']
+    return suma/cant_sumas
+
+
+
+def Opciones(oficinas, lista_colores):
     layuot = [
         [sg.Text('OPCIONES')],
         [sg.Frame('1. Cantidad de palabras', layout=[
@@ -158,7 +190,7 @@ def Opciones(oficinas,lista_colores):
         [sg.Text('4. Tipo de letra:'),
          sg.InputCombo(values=('Mayuscula', 'Minuscula'), default_value='Mayuscula', size=(20, 1))],
         [sg.Text('5. Oficina para tomar datos:'),
-         sg.InputCombo(values=(oficinas), default_value=oficinas[0], size=(5, 1))],
+         sg.InputCombo(values=(oficinas), default_value=oficinas[0], size=(20, 1))],
         [sg.Text('6. Tipo de ayuda:'),
          sg.InputCombo(values=('Sin ayuda', 'Definiciones', 'Lista de palabras'), default_value='Sin ayuda',
                        size=(20, 1))],
@@ -171,8 +203,92 @@ def Opciones(oficinas,lista_colores):
 
     return values
 
+
+def agregar_eliminar():
+    layout=[
+        [sg.Text('7. Opcion para agregar o borrar palabras: '),sg.Input(default_text='ingrese una palabra'),sg.Button('Agregar'),sg.Button('Eliminar')],
+        [sg.Button('Terminar')]
+    ]
+
+    window= sg.Window('CONFIGURACION DE PALABRAS',).Layout(layout)
+
+    while True:
+        button, values= window.Read()
+        if button is not 'Terminar':
+            if button == 'Agregar':
+                main_comprobacion_palabra(values[0])
+            else:
+                if os.path.isfile("Palabras.json"):
+                    arc= open('Palabras.json','r')
+                    data= json.load(arc)
+                    arc.close()
+                    for i in range(len(data)):
+                        if values[0] == data[i]['palabra']:
+                            data.remove(data[i])
+                            arc= open('Palabras.json','w')
+                            json.dump(data,arc)
+                            arc.close()
+            sg.Popup('operacion finalizada')
+        else:
+            break
+
+
+def obtenerListaPalabras(cant_sustantivos,cant_adjetivos,cant_verbos):
+    palabras=[]
+    ListaSustantivos=[]
+    ListaAdjetivos=[]
+    ListaVerbos=[]
+    with open("Palabras.json") as file:
+        data=json.load(file)
+        for d in data:
+            if(d["Tipo"]== "Sustantivo"):
+                ListaSustantivos.append(d["Palabra"])
+            elif(d["Tipo"]=="Adjetivo"):
+                ListaAdjetivos.append(d["Palabra"])
+            else:
+                ListaVerbos.append(d["Palabra"])
+    ListaS=ListaSustantivos.copy()
+    ListaA=ListaAdjetivos.copy()
+    ListaV=ListaVerbos.copy()
+    for i in range(cant_sustantivos):
+        if(ListaS):
+            pal=random.choice(ListaS)
+            palabras.append(pal)
+            ListaS.remove(pal)
+        else:
+            break
+    for i in range(cant_adjetivos):
+        if(ListaA):
+            pal=random.choice(ListaA)
+            palabras.append(pal)
+            ListaA.remove(pal)
+        else:
+            for i in range(cant_verbos):
+                if(ListaV):
+                    pal=random.choice(ListaV)
+                    palabras.append(pal)
+                    ListaV.remove(pal)
+                else:
+                    break
+    return palabras,ListaSustantivos,ListaAdjetivos,ListaVerbos
+
+def CrearListaDefiniciones(lista):
+	ListaDefiniciones=[]
+	with open("Palabras.json") as file:
+		data=json.load(file)
+		for d in data:
+			if(d["Palabra"]) in lista:
+				ListaDefiniciones.append(d["Definicion"])
+	return(ListaDefiniciones)
+				
+			
+	
+
 def Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adjetivos,color_verbos,orientacion,grafia,ayuda,palabras,temp):
 
+    lista_palabras=palabras.copy()
+    
+    ListaDefiniciones=CrearListaDefiniciones(lista_palabras)
 
     # parametros locales
     alto = len(palabras)
@@ -274,7 +390,17 @@ def Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adj
             color_actual = color_adjetivos
         elif event is 'Verbo':
             color_actual = color_verbos
-        #elif verificar, ayuda(sg.window)
+        elif event is 'Ayuda':
+            if ayuda == 'Definiciones':
+                window= sg.Window('Definiciones', background_color=color_de_fondo[0]).Layout([[sg.Text('')]])
+            elif ayuda == 'Lista de palabras':
+                window= sg.Window('Lista de palabras', background_color=color_de_fondo[0]).Layout([[sg.Text(lista_palabras)]])
+                window.Read()
+            else:
+                window= sg.Window('Cantidad de palabras', background_color=color_de_fondo[0]).Layout([[sg.Text('sustantivos: ' + cant_sustantivos + ' adjetivos: ' + cant_adjetivos + ' verbos: ' + cant_verbos)]])
+                window.Read()
+        elif event is 'Verificar':
+            print('Modulo sin hacer')
 
         mouse = values['_GRAPH_']
 
@@ -299,75 +425,49 @@ def Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adj
                     g.DrawText('{}'.format(matriz[box_y][box_x]), letter_location, font='Courier 25')
 
     window.Close()
-def obtenerListaPalabras(cant_sustantivos,cant_adjetivos,cant_verbos):
-	palabras=[]
-	ListaSustantivos=[]
-	ListaAdjetivos=[]
-	ListaVerbos=[]
-	with open("Palabras.json") as file:
-		data=json.load(file)
-		for d in data:
-			if(d["Tipo"]== "Sustantivo"):
-				ListaSustantivos.append(d["Palabra"])
-			elif(d["Tipo"]=="Adjetivo"):
-				ListaAdjetivos.append(d["Palabra"])
-			else:
-				ListaVerbos.append(d["Palabra"])
-	ListaS=ListaSustantivos.copy()
-	ListaA=ListaAdjetivos.copy()
-	ListaV=ListaVerbos.copy()
-	for i in range(cant_sustantivos):
-		if(ListaS):
-			pal=random.choice(ListaS)
-			palabras.append(pal)
-			ListaS.remove(pal)
-		else:
-			break
-	for i in range(cant_adjetivos):
-		if(ListaA):
-			pal=random.choice(ListaA)
-			palabras.append(pal)
-			ListaA.remove(pal)
-		else:
-			break
-	for i in range(cant_verbos):
-		if(ListaV):
-			pal=random.choice(ListaV)
-			palabras.append(pal)
-			ListaV.remove(pal)
-		else:
-			break
-	return palabras,ListaSustantivos,ListaAdjetivos,ListaVerbos
-	
 
 def main():
-    # parametros a recibir
-	palabras,ListaSustantivos,ListaAdjetivos,ListaVerbos = obtenerListaPalabras(1,2,3)
 
-	oficinas = ['1', '2', '3'] #se debe recibir del archivo json
-	temp = random.randint(10, 40)#oficina
-	
-	#Generacion de colores
-	colores = {'amarillo': 'yellow', 'azul': 'blue', 'gris': 'grey', 'rojo': 'red', 'verde': 'green','violeta': 'meduimorchid'}
-	lista_colores = []
-	for color in colores:
-		lista_colores.append(color)
-		
+    #Generacion de oficinas disponibles:
+    oficinas= buscar_oficinas()
+
+
+    #Generacion de colores
+    colores = {'amarillo': 'yellow', 'azul': 'blue', 'gris': 'grey', 'rojo': 'red', 'verde': 'green',
+               'violeta': 'meduimorchid'}
+    lista_colores = []
+    for color in colores:
+        lista_colores.append(color)
+
     #funcion para configuracion
-	values= Opciones(oficinas,lista_colores)
-	cant_sustantivos = values[0]
-	cant_adjetivos = values[1]
-	cant_verbos = values[2]
-	color_sustantivos = colores[values[3]]
-	color_adjetivos = colores[values[4]]
-	color_verbos = colores[values[5]]
-	orientacion = values[6]
-	grafia = values[7]
-	oficina = values[8]
-	ayuda = values[9]
+    values= Opciones(oficinas,lista_colores)
+    cant_sustantivos = values[0]
+    cant_adjetivos = values[1]
+    cant_verbos = values[2]
+    color_sustantivos = colores[values[3]]
+    color_adjetivos = colores[values[4]]
+    color_verbos = colores[values[5]]
+    orientacion = values[6]
+    grafia = values[7]
+    oficina = values[8]
+    ayuda = values[9]
+
+
+    #Generacion de temperatura promedio
+    temp = calcular_promedio(oficina)
+
+    #Funcion para agregar o eliminar palabras
+    agregar_eliminar()
+
+    #Generacion de lista de palabras
+    datos=obtenerListaPalabras(int(cant_sustantivos),int(cant_adjetivos),int(cant_verbos))
+    palabras=datos[0]
+    ListaSustantivos= datos[1]
+    ListaAdjetivos=datos[2]
+    ListaVerbos=datos[3]
 
     #funcion sopa
-	Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adjetivos,color_verbos,orientacion,grafia,ayuda,palabras,temp)
+    Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adjetivos,color_verbos,orientacion,grafia,ayuda,palabras,temp)
 
 if __name__ == '__main__':
     main()
