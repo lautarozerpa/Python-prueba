@@ -76,13 +76,12 @@ def BuscarEnPattern(palabra):
 
 
 def BuscarDefinicionEnWiki(palabra):
+	contenido=""
 	engine = wik(language='es')
 	article = engine.article(palabra)
 	for section in article.sections:
 		if ("Etimolog") in repr(section):
 			contenido = (repr(section.content))
-		else:
-			contenido=" "
 	return limpiarOracion(contenido)
 
 
