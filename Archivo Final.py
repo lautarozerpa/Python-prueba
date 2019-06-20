@@ -343,10 +343,7 @@ def obtenerListaPalabras(cant_sustantivos,cant_adjetivos,cant_verbos):
 def main():
     # parametros a recibir
 	palabras,ListaSustantivos,ListaAdjetivos,ListaVerbos = obtenerListaPalabras(1,2,3)
-	print(palabras)
-	print(ListaSustantivos)
-	print(ListaAdjetivos)
-	print(ListaVerbos)
+
 	oficinas = ['1', '2', '3'] #se debe recibir del archivo json
 	temp = random.randint(10, 40)#oficina
 	
