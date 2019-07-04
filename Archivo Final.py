@@ -249,6 +249,8 @@ def obtenerListaPalabras(cant_sustantivos,cant_adjetivos,cant_verbos):
     ListaS=ListaSustantivos.copy()
     ListaA=ListaAdjetivos.copy()
     ListaV=ListaVerbos.copy()
+    
+		
     for i in range(cant_sustantivos):
         if(ListaS):
             pal=random.choice(ListaS)
@@ -427,46 +429,56 @@ def Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adj
 
 def main():
 
-    #Generacion de oficinas disponibles:
-    oficinas= buscar_oficinas()
-
-
-    #Generacion de colores
-    colores = {'amarillo': 'yellow', 'azul': 'blue', 'gris': 'grey', 'rojo': 'red', 'verde': 'green',
-               'violeta': 'meduimorchid'}
-    lista_colores = []
-    for color in colores:
-        lista_colores.append(color)
-
-    #funcion para configuracion
-    values= Opciones(oficinas,lista_colores)
-    cant_sustantivos = values[0]
-    cant_adjetivos = values[1]
-    cant_verbos = values[2]
-    color_sustantivos = colores[values[3]]
-    color_adjetivos = colores[values[4]]
-    color_verbos = colores[values[5]]
-    orientacion = values[6]
-    grafia = values[7]
-    oficina = values[8]
-    ayuda = values[9]
-
-
-    #Generacion de temperatura promedio
-    temp = calcular_promedio(oficina)
-
-    #Funcion para agregar o eliminar palabras
-    agregar_eliminar()
-
-    #Generacion de lista de palabras
-    datos=obtenerListaPalabras(int(cant_sustantivos),int(cant_adjetivos),int(cant_verbos))
-    palabras=datos[0]
-    ListaSustantivos= datos[1]
-    ListaAdjetivos=datos[2]
-    ListaVerbos=datos[3]
-
-    #funcion sopa
-    Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adjetivos,color_verbos,orientacion,grafia,ayuda,palabras,temp)
+	#Generacion de oficinas disponibles:
+	oficinas= buscar_oficinas()
+	
+	
+	#Generacion de colores
+	colores = {'amarillo': 'yellow', 'azul': 'blue', 'gris': 'grey', 'rojo': 'red', 'verde': 'green',
+			   'violeta': 'meduimorchid'}
+	lista_colores = []
+	for color in colores:
+		lista_colores.append(color)
+	
+	#funcion para configuracion
+	values= Opciones(oficinas,lista_colores)
+	cant_sustantivos = values[0]
+	cant_adjetivos = values[1]
+	cant_verbos = values[2]
+	color_sustantivos = colores[values[3]]
+	color_adjetivos = colores[values[4]]
+	color_verbos = colores[values[5]]
+	orientacion = values[6]
+	grafia = values[7]
+	oficina = values[8]
+	ayuda = values[9]
+	
+	
+	#Generacion de temperatura promedio
+	temp = calcular_promedio(oficina)
+	
+	#Funcion para agregar o eliminar palabras
+	agregar_eliminar()
+	
+	#Generacion de lista de palabras
+	datos=obtenerListaPalabras(int(cant_sustantivos),int(cant_adjetivos),int(cant_verbos))
+	palabras=datos[0]
+	ListaSustantivos= datos[1]
+	ListaAdjetivos=datos[2]
+	ListaVerbos=datos[3]
+	
+	s=int(cant_sustantivos)
+	a=int(cant_adjetivos)
+	v=int(cant_verbos)
+	if(s > len(ListaSustantivos)):
+		cant_sustantivos = str(len(ListaSustantivos))
+	if (a > len(ListaAdjetivos)):
+		cant_adjetivos = str(len(ListaAdjetivos))
+	if (v > len(ListaVerbos)):
+		cant_verbos = str(len(ListaVerbos))
+	
+	#funcion sopa
+	Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adjetivos,color_verbos,orientacion,grafia,ayuda,palabras,temp)
 
 if __name__ == '__main__':
     main()

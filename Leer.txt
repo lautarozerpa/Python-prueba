@@ -1,4 +1,3 @@
 Elementos que faltan a la hora de hacer la primer entrega:
 -Falta terminar el modulo de verificacion
 -Falta mostrar la ayuda con las definiciones
--Falta corregir la ayuda en la cantidad de palabras
