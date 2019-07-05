@@ -3,5 +3,20 @@
         "Palabra": "mesa",
         "Tipo": "Sustantivo",
         "Definicion": "' Del latin mensa.'"
+    },
+    {
+        "Palabra": "perro",
+        "Tipo": "Sustantivo",
+        "Definicion": "' Incierta. La completa carencia de cognados en otras lenguas, asi como su tardia aparicion hacia mediados del siglo XII, hacen improbable un etimo prerromano; Corominas apunta como mas plausible un origen expresivo en la interjeccion usada para llamar al animal, u onomatopeyica de su grunido. Viejas teorias que lo relacionaban con el latin petra o, como en la fantasiosa entrada del DRAE de 1737, con el griego antiguo \u03c0\u03c5\u03c1 (pyr), carecen por entero de fundamento. Mas verosimil es la teoria de que la palabra es de origen gitano, como la palabra inglesa pal que significa amigo. La primera aparicion de la palabra escrita no es anterior a la primera migracion de los gitanos a Espana. [cita requerida]'"
+    },
+    {
+        "Palabra": "salir",
+        "Tipo": "Verbo",
+        "Definicion": "' Si puedes, incorporala: ver como'"
+    },
+    {
+        "Palabra": "sucio",
+        "Tipo": "Adjetivo",
+        "Definicion": "' Si puedes, incorporala: ver comoDel latin succidus, variante de sucidus (jugoso, graso, o grasoso).'"
     }
 ]
