@@ -233,45 +233,43 @@ def agregar_eliminar():
 
 
 def obtenerListaPalabras(cant_sustantivos,cant_adjetivos,cant_verbos):
-    palabras=[]
-    ListaSustantivos=[]
-    ListaAdjetivos=[]
-    ListaVerbos=[]
-    with open("Palabras.json") as file:
-        data=json.load(file)
-        for d in data:
-            if(d["Tipo"]== "Sustantivo"):
-                ListaSustantivos.append(d["Palabra"])
-            elif(d["Tipo"]=="Adjetivo"):
-                ListaAdjetivos.append(d["Palabra"])
-            else:
-                ListaVerbos.append(d["Palabra"])
-    ListaS=ListaSustantivos.copy()
-    ListaA=ListaAdjetivos.copy()
-    ListaV=ListaVerbos.copy()
-    
-		
-    for i in range(cant_sustantivos):
-        if(ListaS):
-            pal=random.choice(ListaS)
-            palabras.append(pal)
-            ListaS.remove(pal)
-        else:
-            break
-    for i in range(cant_adjetivos):
-        if(ListaA):
-            pal=random.choice(ListaA)
-            palabras.append(pal)
-            ListaA.remove(pal)
-        else:
-            for i in range(cant_verbos):
-                if(ListaV):
-                    pal=random.choice(ListaV)
-                    palabras.append(pal)
-                    ListaV.remove(pal)
-                else:
-                    break
-    return palabras,ListaSustantivos,ListaAdjetivos,ListaVerbos
+	palabras=[]
+	ListaSustantivos=[]
+	ListaAdjetivos=[]
+	ListaVerbos=[]
+	with open("Palabras.json") as file:
+		data=json.load(file)
+		for d in data:
+			if(d["Tipo"]== "Sustantivo"):
+				ListaSustantivos.append(d["Palabra"])
+			elif(d["Tipo"]=="Adjetivo"):
+				ListaAdjetivos.append(d["Palabra"])
+			elif(d["Tipo"]=="Verbo"):
+				ListaVerbos.append(d["Palabra"])
+	ListaS=ListaSustantivos.copy()
+	ListaA=ListaAdjetivos.copy()
+	ListaV=ListaVerbos.copy()	
+	for i in range(cant_sustantivos):
+		if(ListaS):
+			pal=random.choice(ListaS)
+			palabras.append(pal)
+			ListaS.remove(pal)
+		else:
+			break
+	for i in range(cant_adjetivos):
+		if(ListaA):
+			pal=random.choice(ListaA)
+			palabras.append(pal)
+			ListaA.remove(pal)
+		else:
+			break
+	for i in range(cant_verbos):
+		if(ListaV):
+			pal=random.choice(ListaV)
+			palabras.append(pal)
+			ListaV.remove(pal)
+		else:break
+	return palabras,ListaSustantivos,ListaAdjetivos,ListaVerbos
 
 def CrearListaDefiniciones(lista):
 	ListaDefiniciones=[]
@@ -281,19 +279,35 @@ def CrearListaDefiniciones(lista):
 			if(d["Palabra"]) in lista:
 				ListaDefiniciones.append(d["Definicion"])
 	return(ListaDefiniciones)
+
+def AbrirVentanaAyuda(ListaDefiniciones):
+	x=0
+	while True:
+		layoutAyuda=[[sg.Text(ListaDefiniciones[x],size=(10,10))],[sg.Button('< Prev'), sg.Button('Next >'), sg.Button('Volver')]]
+		if x==0:
+			layoutAyuda[1].pop(0)
+		if x== (len(ListaDefiniciones)-1):
+			layoutAyuda[1].pop(1)
+		winAyuda= sg.Window('Window 2').Layout(layoutAyuda)
+		event2,values2=winAyuda.Read()
+		if event2== ('Volver'): 
+			winAyuda.Close()
+			break
+		elif (event2== '< Prev')and (x>=0):
+			x= x-1
+			winAyuda.Close()
+		elif (event2== 'Next >') and (x<(len(ListaDefiniciones)-1)):x= x+1
+		winAyuda.Close()
 				
 			
-	
-
 def Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adjetivos,color_verbos,orientacion,grafia,ayuda,palabras,temp):
 
     lista_palabras=palabras.copy()
     
     ListaDefiniciones=CrearListaDefiniciones(lista_palabras)
-
     # parametros locales
     alto = len(palabras)
-    ancho = max(len(pal) for pal in palabras)
+    ancho = (max(len(pal) for pal in palabras)+3)
     BOX_SIZE = 25
     matriz = []
 
@@ -393,7 +407,10 @@ def Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adj
             color_actual = color_verbos
         elif event is 'Ayuda':
             if ayuda == 'Definiciones':
-                window= sg.Window('Definiciones', background_color=color_de_fondo[0]).Layout([[sg.Text('')]])
+                winayuda_active= True
+                window.Hide()
+                AbrirVentanaAyuda(ListaDefiniciones)
+                window.UnHide()
             elif ayuda == 'Lista de palabras':
                 window= sg.Window('Lista de palabras', background_color=color_de_fondo[0]).Layout([[sg.Text(lista_palabras)]])
                 window.Read()
