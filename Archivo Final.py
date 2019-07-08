@@ -76,7 +76,7 @@ def BuscarEnPattern(palabra):
 
 
 def BuscarDefinicionEnWiki(palabra):
-	contenido=""
+	contenido = ""
 	engine = wik(language='es')
 	article = engine.article(palabra)
 	for section in article.sections:
@@ -142,10 +142,11 @@ def main_comprobacion_palabra(palabra):
 	else:
 		ReportePatternYWiki(palabra)
 
+
 def buscar_oficinas():
 	arc = open('datos-oficinas.json', 'r')
-	data= json.load(arc)
-	lista=[]
+	data = json.load(arc)
+	lista = []
 	for x in data:
 		lista.append(x)
 	arc.close()
@@ -155,14 +156,13 @@ def buscar_oficinas():
 def calcular_promedio(ofi):
 	arc = open('datos-oficinas.json', 'r')
 	data = json.load(arc)
-	data= data[ofi]
-	suma=0
-	cant_sumas=0
+	data = data[ofi]
+	suma = 0
+	cant_sumas = 0
 	for elem in data:
-		cant_sumas= cant_sumas +1
+		cant_sumas = cant_sumas + 1
 		suma = suma + elem['temp']
-	return suma/cant_sumas
-
+	return suma / cant_sumas
 
 
 def Opciones(oficinas, lista_colores):
@@ -205,119 +205,225 @@ def Opciones(oficinas, lista_colores):
 
 
 def agregar_eliminar():
-	layout=[
-		[sg.Text('7. Opcion para agregar o borrar palabras: '),sg.Input(default_text='ingrese una palabra'),sg.Button('Agregar'),sg.Button('Eliminar')],
+	layout = [
+		[sg.Text('7. Opcion para agregar o borrar palabras: '), sg.Input(default_text='ingrese una palabra'),
+		 sg.Button('Agregar'), sg.Button('Eliminar')],
 		[sg.Button('Terminar')]
 	]
 
-	window= sg.Window('CONFIGURACION DE PALABRAS',).Layout(layout)
+	window = sg.Window('CONFIGURACION DE PALABRAS', ).Layout(layout)
 
 	while True:
-		button, values= window.Read()
+		button, values = window.Read()
 		if button is not 'Terminar':
 			if button == 'Agregar':
 				main_comprobacion_palabra(values[0])
 			else:
 				if os.path.isfile("Palabras.json"):
-					arc= open('Palabras.json','r')
-					data= json.load(arc)
+					arc = open('Palabras.json', 'r')
+					data = json.load(arc)
 					arc.close()
 					for i in range(len(data)):
 						if values[0] == data[i]['palabra']:
 							data.remove(data[i])
-							arc= open('Palabras.json','w')
-							json.dump(data,arc)
+							arc = open('Palabras.json', 'w')
+							json.dump(data, arc)
 							arc.close()
 			sg.Popup('operacion finalizada')
 		else:
 			window.Close()
 			break
 
-def obtenerListaPalabras(cant_sustantivos,cant_adjetivos,cant_verbos):
-	palabras=[]
-	ListaSustantivos=[]
-	ListaAdjetivos=[]
-	ListaVerbos=[]
+
+def obtenerListaPalabras(cant_sustantivos, cant_adjetivos, cant_verbos):
+	palabras = []
+	ListaSustantivos = []
+	ListaAdjetivos = []
+	ListaVerbos = []
 	with open("Palabras.json") as file:
-		data=json.load(file)
+		data = json.load(file)
 		for d in data:
-			if(d["Tipo"]== "Sustantivo"):
+			if (d["Tipo"] == "Sustantivo"):
 				ListaSustantivos.append(d["Palabra"])
-			elif(d["Tipo"]=="Adjetivo"):
+			elif (d["Tipo"] == "Adjetivo"):
 				ListaAdjetivos.append(d["Palabra"])
-			elif(d["Tipo"]=="Verbo"):
+			elif (d["Tipo"] == "Verbo"):
 				ListaVerbos.append(d["Palabra"])
-	ListaS=ListaSustantivos.copy()
-	ListaA=ListaAdjetivos.copy()
-	ListaV=ListaVerbos.copy()	
+	ListaS = ListaSustantivos.copy()
+	ListaA = ListaAdjetivos.copy()
+	ListaV = ListaVerbos.copy()
 	for i in range(cant_sustantivos):
-		if(ListaS):
-			pal=random.choice(ListaS)
+		if (ListaS):
+			pal = random.choice(ListaS)
 			palabras.append(pal)
 			ListaS.remove(pal)
 		else:
 			break
 	for i in range(cant_adjetivos):
-		if(ListaA):
-			pal=random.choice(ListaA)
+		if (ListaA):
+			pal = random.choice(ListaA)
 			palabras.append(pal)
 			ListaA.remove(pal)
 		else:
 			break
 	for i in range(cant_verbos):
-		if(ListaV):
-			pal=random.choice(ListaV)
+		if (ListaV):
+			pal = random.choice(ListaV)
 			palabras.append(pal)
 			ListaV.remove(pal)
-		else:break
-	return palabras,ListaSustantivos,ListaAdjetivos,ListaVerbos
+		else:
+			break
+	return palabras, ListaSustantivos, ListaAdjetivos, ListaVerbos
+
 
 def CrearListaDefiniciones(lista):
-	ListaDefiniciones=[]
+	ListaDefiniciones = []
 	with open("Palabras.json") as file:
-		data=json.load(file)
+		data = json.load(file)
 		for d in data:
-			if(d["Palabra"]) in lista:
+			if (d["Palabra"]) in lista:
 				ListaDefiniciones.append(d["Definicion"])
-	return(ListaDefiniciones)
+	return (ListaDefiniciones)
 
-def AbrirVentanaAyuda(ListaDefiniciones,color_de_fondo):
-	x=0
+
+def AbrirVentanaAyuda(ListaDefiniciones, color_de_fondo):
+	x = 0
 	while True:
-		layoutAyuda=[[sg.Text(ListaDefiniciones[x],size=(30,30))],[sg.Button('< Prev'), sg.Button('Next >'), sg.Button('Volver')]]
-		if x==0:
+		layoutAyuda = [[sg.Text(ListaDefiniciones[x], background_color=(color_de_fondo[0]), size=(30, 30))],
+					   [sg.Button('< Prev'), sg.Button('Next >'), sg.Button('Volver')]]
+		if x == 0:
 			layoutAyuda[1].pop(0)
-		elif x== (len(ListaDefiniciones)-1):
+		elif x == (len(ListaDefiniciones) - 1):
 			layoutAyuda[1].pop(1)
-		winAyuda= sg.Window('Ayuda',background_color=color_de_fondo[1]).Layout(layoutAyuda)
-		event2,values2=winAyuda.Read()
-		if event2== ('Volver'): 
+		winAyuda = sg.Window('Ayuda', background_color=color_de_fondo[1]).Layout(layoutAyuda)
+		event2, values2 = winAyuda.Read()
+		if event2 == ('Volver'):
 			winAyuda.Close()
 			break
-		elif (event2== '< Prev')and (x>=0):
-			x= x-1
+		elif (event2 == '< Prev') and (x >= 0):
+			x = x - 1
 			winAyuda.Close()
-		elif (event2== 'Next >') and (x<(len(ListaDefiniciones)-1)):x= x+1
+		elif (event2 == 'Next >') and (x < (len(ListaDefiniciones) - 1)):
+			x = x + 1
 		winAyuda.Close()
 
-def AbrirVentanaAyudaSimple(Ayuda,color_de_fondo):
-	layoutAyuda=[[sg.Text(Ayuda,size=(30,30))],[sg.Button('Volver')]]
-	winAyuda= sg.Window('Ayuda',background_color=color_de_fondo[1]).Layout(layoutAyuda)
-	e,v=winAyuda.Read()
-	winAyuda.Close()
+
+def AbrirVentanaAyudaSimple(Ayuda, color_de_fondo):
+	layoutAyuda = [[sg.Text(Ayuda, background_color=(color_de_fondo[0]), size=(30, 30))], [sg.Button('Volver')]]
+	winAyuda = sg.Window('Ayuda', background_color=color_de_fondo[1]).Layout(layoutAyuda)
+	e, v = winAyuda.Read()
+	if e is 'Volver':
+		winAyuda.Close()
 
 
-def Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adjetivos,color_verbos,orientacion,grafia,ayuda,palabras,temp):
+def colorear_matriz(matriz, sustantivos, adjetivos, verbos, lineas, colorS, colorA, colorV, orientacion):
+	for i in range(len(lineas)):
+		x = 0
+		palabra_sin_encontrar = True
+		while palabra_sin_encontrar:
+			if x <= len(sustantivos):
+				if sustantivos[x] in lineas[i]:
+					palabra_sin_encontrar = False
+					color = colorS
+					pal = sustantivos[x]
+			if x <= len(adjetivos):
+				if adjetivos[x] in lineas[i]:
+					palabra_sin_encontrar = False
+					color = colorA
+					pal = adjetivos[x]
+			if x <= len(verbos):
+				if verbos[x] in lineas[i]:
+					palabra_sin_encontrar = False
+					color = colorV
+					pal = verbos[x]
+		x = 0
+		if orientacion == 'Horizontal':
+			while matriz[i][x]['letra'] != pal[0]:
+				x = x + 1
+			for k in range(x, x + len(pal)):
+				matriz[i][k]['color'] = color
+		else:
+			while matriz[x][i]['letra'] != pal[0]:
+				x = x + 1
+			for k in range(x, x + len(pal)):
+				matriz[k][i]['color'] = color
+	return matriz
 
-	lista_palabras=palabras.copy()
 
-	ListaDefiniciones=CrearListaDefiniciones(lista_palabras)
+def Verificacion(matriz, matriz_correcta, ancho, alto):
+	for x in range(alto):
+		for y in range(ancho):
+			if matriz[x][y]['color'] == matriz_correcta[x][y]['color']:
+				matriz[x][y]['color'] = 'green'
+			else:
+				matriz[x][y]['color'] = 'red'
+	return matriz
+
+
+def Dibujar_sopa_final(matriz, color_de_fondo, orientacion, ancho, alto, BOX_SIZE):
+	if orientacion == 'Horizontal':
+
+		# Layout
+		layout = [
+			[sg.Text('', key='_OUTPUT_')],
+			[sg.Graph((ancho * 40 - 1, alto * 40 - 1), (0, alto * 25 - 1), (ancho * 25, 0 - 1), key='_GRAPH_',
+					  background_color=color_de_fondo[0], change_submits=True, drag_submits=False)],
+			[sg.Button('Salir')]
+		]
+
+		window = sg.Window('Sopa de letras', background_color=color_de_fondo[1]).Layout(layout).Finalize()
+
+		g = window.FindElement('_GRAPH_')
+
+		# Dibujo horizontal
+		for row in range(alto):
+			for col in range(ancho):
+				letra = matriz[row][col]['letra']
+				color_actual = matriz[row][col]['color']
+				g.DrawRectangle((col * BOX_SIZE, row * BOX_SIZE),
+								(col * BOX_SIZE + BOX_SIZE, row * BOX_SIZE + BOX_SIZE),
+								line_color='black', fill_color=color_actual)
+
+				g.DrawText('{}'.format(letra), (col * BOX_SIZE + 13, row * BOX_SIZE + 13), font='Courier 25')
+
+
+	else:
+
+		# Layout
+		layout = [
+			[sg.Text('', key='_OUTPUT_')],
+			[sg.Graph((alto * 40 - 1, ancho * 40 - 1), (0, ancho * 25 - 1), (alto * 25, 0 - 1), key='_GRAPH_',
+					  background_color=color_de_fondo[0], change_submits=True, drag_submits=False)],
+			[sg.Button('Salir')]
+		]
+
+		window = sg.Window('Sopa de letras', background_color=color_de_fondo[1]).Layout(layout).Finalize()
+
+		g = window.FindElement('_GRAPH_')
+
+		# Dibujo vertical
+		for row in range(ancho):
+			for col in range(alto):
+				letra = matriz[col][row]['letra']
+				color_actual = matriz[col][row]['color']
+				g.DrawRectangle((col * BOX_SIZE, row * BOX_SIZE),
+								(col * BOX_SIZE + BOX_SIZE, row * BOX_SIZE + BOX_SIZE),
+								fill_color=color_actual, line_color='black', )
+
+				g.DrawText('{}'.format(letra), (col * BOX_SIZE + 13, row * BOX_SIZE + 13), font='Courier 25')
+
+
+def Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color_adjetivos, color_verbos, orientacion,
+		 grafia, ayuda, palabras, sustantivos, adjetivos, verbos, temp):
+
+	lista_palabras = palabras.copy()
+
+	ListaDefiniciones = CrearListaDefiniciones(lista_palabras)
 	# parametros locales
 	alto = len(palabras)
-	ancho = (max(len(pal) for pal in palabras)+3)
+	ancho = (max(len(pal) for pal in palabras) + 3)
 	BOX_SIZE = 25
 	matriz = []
-
 
 
 	# Calculo de temperatura
@@ -328,15 +434,22 @@ def Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adj
 
 	color_actual = color_de_fondo[1]
 
+
 	# Relleno de palabras
 	for i in range(len(palabras)):
 		pal = palabras[i]
 		while (len(pal) < ancho):
 			op = random.randint(0, 1)
 			if op == 1:
-				pal = pal + random.choice('qwertyuioplkjhgfdsazxcvbnm')
+				l = random.choice('qwertyuioplkjhgfdsazxcvbnm')
+				while l == lista_palabras[i][0]:
+					l = random.choice('qwertyuioplkjhgfdsazxcvbnm')
+				pal = pal + l
 			else:
-				pal = random.choice('qwertyuioplkjhgfdsazxcvbnm') + pal
+				l = random.choice('qwertyuioplkjhgfdsazxcvbnm')
+				while l == lista_palabras[i][0]:
+					l = random.choice('qwertyuioplkjhgfdsazxcvbnm')
+				pal = l + pal
 		palabras[i] = pal
 
 	# Calculo de grafia
@@ -347,58 +460,67 @@ def Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adj
 		for i in range(len(palabras)):
 			palabras[i] = palabras[i].lower()
 
-
 	# Calculo de orientacion
 
 	if orientacion == 'Horizontal':
 
-		#Layout
+		# Layout
 		layout = [
 			[sg.Text('temperatura actual: ' + str(temp)), sg.Text('', key='_OUTPUT_')],
 			[sg.Graph((ancho * 40 - 1, alto * 40 - 1), (0, alto * 25 - 1), (ancho * 25, 0 - 1), key='_GRAPH_',
 					  background_color=color_de_fondo[0], change_submits=True, drag_submits=False)],
-			[sg.Button('Sustantivo'), sg.Button('Adjetivo'), sg.Button('Verbo'),sg.Button('Verificar'),sg.Button('Ayuda'), sg.Button('Salir')]
+			[sg.Button('Sustantivo'), sg.Button('Adjetivo'), sg.Button('Verbo'), sg.Button('Verificar'),
+			 sg.Button('Ayuda'), sg.Button('Salir')]
 		]
 
 		window = sg.Window('Sopa de letras', background_color=color_de_fondo[1]).Layout(layout).Finalize()
 
 		g = window.FindElement('_GRAPH_')
 
-		#Dibujo
+		# Dibujo horizontal
 		for row in range(alto):
 			matriz.append([])
 			for col in range(ancho):
 				letra = palabras[row][col]
-				g.DrawRectangle((col * BOX_SIZE, row * BOX_SIZE), (col * BOX_SIZE + BOX_SIZE, row * BOX_SIZE + BOX_SIZE),
+				g.DrawRectangle((col * BOX_SIZE, row * BOX_SIZE),
+								(col * BOX_SIZE + BOX_SIZE, row * BOX_SIZE + BOX_SIZE),
 								line_color='black')
 
 				g.DrawText('{}'.format(letra), (col * BOX_SIZE + 13, row * BOX_SIZE + 13), font='Courier 25')
-				matriz[row].append(letra)
+				dic_casillero = {'letra': letra, 'color': color_actual}
+				matriz[row].append(dic_casillero)
+
 	else:
 
-		#Layout
+		# Layout
 		layout = [
 			[sg.Text('temperatura actual: ' + str(temp)), sg.Text('', key='_OUTPUT_')],
 			[sg.Graph((alto * 40 - 1, ancho * 40 - 1), (0, ancho * 25 - 1), (alto * 25, 0 - 1), key='_GRAPH_',
 					  background_color=color_de_fondo[0], change_submits=True, drag_submits=False)],
-			[sg.Button('Sustantivo'), sg.Button('Adjetivo'), sg.Button('Verbo'),sg.Button('Verificar'),sg.Button('Ayuda'),sg.Button('Salir')]
+			[sg.Button('Sustantivo'), sg.Button('Adjetivo'), sg.Button('Verbo'), sg.Button('Verificar'),
+			 sg.Button('Ayuda'), sg.Button('Salir')]
 		]
 
 		window = sg.Window('Sopa de letras', background_color=color_de_fondo[1]).Layout(layout).Finalize()
 
 		g = window.FindElement('_GRAPH_')
 
-
-		#Dibujo
+		# Dibujo vertical
 		for row in range(ancho):
 			matriz.append([])
 			for col in range(alto):
 				letra = palabras[col][row]
-				g.DrawRectangle((col * BOX_SIZE, row * BOX_SIZE), (col * BOX_SIZE + BOX_SIZE, row * BOX_SIZE + BOX_SIZE),
+				g.DrawRectangle((col * BOX_SIZE, row * BOX_SIZE),
+								(col * BOX_SIZE + BOX_SIZE, row * BOX_SIZE + BOX_SIZE),
 								line_color='black')
 
 				g.DrawText('{}'.format(letra), (col * BOX_SIZE + 13, row * BOX_SIZE + 13), font='Courier 25')
-				matriz[row].append(letra)
+				dic_casillero = {'letra': letra, 'color': color_actual}
+				matriz[row].append(dic_casillero)
+
+
+	color_actual= color_de_fondo[0]
+	ant=color_actual
 
 	# Uso de la sopa
 	while True:  # Event Loop
@@ -414,24 +536,32 @@ def Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adj
 			color_actual = color_verbos
 		elif event is 'Ayuda':
 			if ayuda == 'Definiciones':
-				winayuda_active= True
+				winayuda_active = True
 				window.Hide()
-				AbrirVentanaAyuda(ListaDefiniciones,color_de_fondo)
+				AbrirVentanaAyuda(ListaDefiniciones, color_de_fondo)
 				window.UnHide()
 			elif ayuda == 'Lista de palabras':
-				winayuda_active= True 
+				winayuda_active = True
 				window.Hide()
-				AbrirVentanaAyudaSimple(lista_palabras,color_de_fondo)
+				AbrirVentanaAyudaSimple(lista_palabras, color_de_fondo)
 				window.UnHide()
 			else:
-				winayuda_active= True
+				winayuda_active = True
 				window.Hide()
-				AbrirVentanaAyudaSimple('sustantivos: ' + cant_sustantivos + ' adjetivos: ' + cant_adjetivos + ' verbos: ' + cant_verbos, color_de_fondo)
+				AbrirVentanaAyudaSimple(
+					'sustantivos: ' + cant_sustantivos + ' adjetivos: ' + cant_adjetivos + ' verbos: ' + cant_verbos,
+					color_de_fondo)
 				window.UnHide()
 		elif event is 'Verificar':
-			print('Modulo sin hacer')
+			matriz_correcta=colorear_matriz(matriz, sustantivos, adjetivos, verbos, palabras, color_sustantivos,
+							color_adjetivos,
+							color_verbos, orientacion)
+			matriz_resultante = Verificacion(matriz, matriz_correcta, ancho, alto)
+			Dibujar_sopa_final(matriz_resultante, color_de_fondo, orientacion, ancho, alto, BOX_SIZE)
+			break
 
 		mouse = values['_GRAPH_']
+		cambio= False
 
 		if event == '_GRAPH_':
 			if mouse == (None, None):
@@ -439,37 +569,50 @@ def Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adj
 			box_x = mouse[0] // BOX_SIZE
 			box_y = mouse[1] // BOX_SIZE
 			letter_location = (box_x * BOX_SIZE + 13, box_y * BOX_SIZE + 13)
-			if orientacion== 'Horizontal':
+			cambio = False
+			if orientacion == 'Horizontal':
 				if (box_x < ancho and box_y < alto):
-					print(box_x, box_y)
+					if matriz[box_y][box_x]['color'] == color_actual:
+						ant= color_actual
+						color_actual = color_de_fondo[0]
+						cambio=True
+					matriz[box_y][box_x]['color'] = color_actual
 					g.DrawRectangle((box_x * BOX_SIZE, box_y * BOX_SIZE),
 									(box_x * BOX_SIZE + BOX_SIZE, box_y * BOX_SIZE + BOX_SIZE), line_color='black',
 									fill_color=color_actual)
-					g.DrawText('{}'.format(matriz[box_y][box_x]), letter_location, font='Courier 25')
+					g.DrawText('{}'.format(matriz[box_y][box_x]['letra']), letter_location, font='Courier 25')
+					if cambio:
+						color_actual= ant
 			else:
 				if (box_x < alto and box_y < ancho):
+					if (matriz[box_x][box_y]['color'] == color_actual):
+						ant= color_actual
+						color_actual = color_de_fondo[0]
+						cambio= True
+					matriz[box_x][box_y]['color'] = color_actual
 					g.DrawRectangle((box_x * BOX_SIZE, box_y * BOX_SIZE),
 									(box_x * BOX_SIZE + BOX_SIZE, box_y * BOX_SIZE + BOX_SIZE), line_color='black',
 									fill_color=color_actual)
-					g.DrawText('{}'.format(matriz[box_y][box_x]), letter_location, font='Courier 25')
+					g.DrawText('{}'.format(matriz[box_y][box_x]['letra']), letter_location, font='Courier 25')
+					if cambio:
+						color_actual= ant
 
 	window.Close()
 
-def main():
 
-	#Generacion de oficinas disponibles:
-	oficinas= buscar_oficinas()
-	
-	
-	#Generacion de colores
+def main():
+	# Generacion de oficinas disponibles:
+	oficinas = buscar_oficinas()
+
+	# Generacion de colores
 	colores = {'amarillo': 'yellow', 'azul': 'blue', 'gris': 'grey', 'rojo': 'red', 'verde': 'green',
 			   'violeta': 'meduimorchid'}
 	lista_colores = []
 	for color in colores:
 		lista_colores.append(color)
-	
-	#funcion para configuracion
-	values= Opciones(oficinas,lista_colores)
+
+	# funcion para configuracion
+	values = Opciones(oficinas, lista_colores)
 	cant_sustantivos = values[0]
 	cant_adjetivos = values[1]
 	cant_verbos = values[2]
@@ -480,33 +623,34 @@ def main():
 	grafia = values[7]
 	oficina = values[8]
 	ayuda = values[9]
-	
-	
-	#Generacion de temperatura promedio
+
+	# Generacion de temperatura promedio
 	temp = calcular_promedio(oficina)
-	
-	#Funcion para agregar o eliminar palabras
+
+	# Funcion para agregar o eliminar palabras
 	agregar_eliminar()
-	
-	#Generacion de lista de palabras
-	datos=obtenerListaPalabras(int(cant_sustantivos),int(cant_adjetivos),int(cant_verbos))
-	palabras=datos[0]
-	ListaSustantivos= datos[1]
-	ListaAdjetivos=datos[2]
-	ListaVerbos=datos[3]
-	
-	s=int(cant_sustantivos)
-	a=int(cant_adjetivos)
-	v=int(cant_verbos)
-	if(s > len(ListaSustantivos)):
+
+	# Generacion de lista de palabras
+	datos = obtenerListaPalabras(int(cant_sustantivos), int(cant_adjetivos), int(cant_verbos))
+	palabras = datos[0]
+	ListaSustantivos = datos[1]
+	ListaAdjetivos = datos[2]
+	ListaVerbos = datos[3]
+
+	s = int(cant_sustantivos)
+	a = int(cant_adjetivos)
+	v = int(cant_verbos)
+	if (s > len(ListaSustantivos)):
 		cant_sustantivos = str(len(ListaSustantivos))
 	if (a > len(ListaAdjetivos)):
 		cant_adjetivos = str(len(ListaAdjetivos))
 	if (v > len(ListaVerbos)):
 		cant_verbos = str(len(ListaVerbos))
-	
-	#funcion sopa
-	Sopa(cant_sustantivos,cant_adjetivos,cant_verbos,color_sustantivos,color_adjetivos,color_verbos,orientacion,grafia,ayuda,palabras,temp)
+
+	# funcion sopa
+	Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color_adjetivos, color_verbos, orientacion,
+		 grafia, ayuda, palabras, ListaSustantivos, ListaAdjetivos, ListaVerbos, temp)
+
 
 if __name__ == '__main__':
 	main()
