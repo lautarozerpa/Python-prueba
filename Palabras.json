@@ -18,5 +18,15 @@
         "Palabra": "sucio",
         "Tipo": "Adjetivo",
         "Definicion": "' Si puedes, incorporala: ver comoDel latin succidus, variante de sucidus (jugoso, graso, o grasoso).'"
+    },
+    {
+        "Palabra": "oscuro",
+        "Tipo": "Adjetivo",
+        "Definicion": "' De obscuro, y este del latin obscurus, \"cubierto\", de ob- y -scurus, probablemente de la misma raiz que scutum, \"escudo\", el protoindoeuropeo *(s)k(\\')ew-. Comparese escudo, cutis o el ingles sky'"
+    },
+    {
+        "Palabra": "auto",
+        "Tipo": "Sustantivo",
+        "Definicion": "' Si puedes, incorporala: ver como'"
     }
 ]

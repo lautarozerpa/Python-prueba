@@ -7,3 +7,5 @@ Elementos que faltan a la hora de hacer la primer entrega:
 Elementos corregidos:
 -Se muestran las definiciones
 -Se muestran correctamente la cantidad de palabras
+-La verificacion esta terminada y funciona
+

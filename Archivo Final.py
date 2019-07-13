@@ -252,27 +252,34 @@ def obtenerListaPalabras(cant_sustantivos, cant_adjetivos, cant_verbos):
 	ListaS = ListaSustantivos.copy()
 	ListaA = ListaAdjetivos.copy()
 	ListaV = ListaVerbos.copy()
-	for i in range(cant_sustantivos):
-		if (ListaS):
+	for k in range(len(ListaS)+len(ListaA)+len(ListaV)):
+		num=random.randint(0,2)
+		if num == 0 and ListaS:
 			pal = random.choice(ListaS)
 			palabras.append(pal)
 			ListaS.remove(pal)
 		else:
-			break
-	for i in range(cant_adjetivos):
-		if (ListaA):
+			num=random.randint(1,2)
+		if num == 1 and ListaA:
 			pal = random.choice(ListaA)
 			palabras.append(pal)
 			ListaA.remove(pal)
 		else:
-			break
-	for i in range(cant_verbos):
-		if (ListaV):
+			num = 2
+		if num == 2 and ListaV:
 			pal = random.choice(ListaV)
 			palabras.append(pal)
 			ListaV.remove(pal)
 		else:
-			break
+			if ListaS:
+				pal = random.choice(ListaS)
+				palabras.append(pal)
+				ListaS.remove(pal)
+			else:
+				if ListaA:
+					pal = random.choice(ListaA)
+					palabras.append(pal)
+					ListaA.remove(pal)
 	return palabras, ListaSustantivos, ListaAdjetivos, ListaVerbos
 
 
@@ -316,47 +323,59 @@ def AbrirVentanaAyudaSimple(Ayuda, color_de_fondo):
 		winAyuda.Close()
 
 
-def colorear_matriz(matriz, sustantivos, adjetivos, verbos, lineas, colorS, colorA, colorV, orientacion):
+def colorear_matriz(mc,matriz, sustantivos, adjetivos, verbos, lineas, colorS, colorA, colorV, orientacion):
+	for a in range(2):
+		sustantivos.append('relleno')
+		adjetivos.append('relleno')
+		verbos.append('relleno')
 	for i in range(len(lineas)):
 		x = 0
 		palabra_sin_encontrar = True
 		while palabra_sin_encontrar:
-			if x <= len(sustantivos):
-				if sustantivos[x] in lineas[i]:
+			if x < len(sustantivos):
+				if sustantivos[x].upper() in lineas[i].upper():
 					palabra_sin_encontrar = False
 					color = colorS
 					pal = sustantivos[x]
-			if x <= len(adjetivos):
-				if adjetivos[x] in lineas[i]:
+			if x < len(adjetivos):
+				if adjetivos[x].upper() in lineas[i].upper():
 					palabra_sin_encontrar = False
 					color = colorA
 					pal = adjetivos[x]
-			if x <= len(verbos):
-				if verbos[x] in lineas[i]:
+			if x < len(verbos):
+				if verbos[x].upper() in lineas[i].upper():
 					palabra_sin_encontrar = False
 					color = colorV
 					pal = verbos[x]
+			x=x+1
 		x = 0
 		if orientacion == 'Horizontal':
-			while matriz[i][x]['letra'] != pal[0]:
+			while matriz[i][x]['letra'].upper() != pal[0].upper():
 				x = x + 1
 			for k in range(x, x + len(pal)):
-				matriz[i][k]['color'] = color
+				mc[i][k]['color'] = color
 		else:
-			while matriz[x][i]['letra'] != pal[0]:
+			while matriz[x][i]['letra'].upper() != pal[0].upper():
 				x = x + 1
 			for k in range(x, x + len(pal)):
-				matriz[k][i]['color'] = color
-	return matriz
+				mc[k][i]['color'] = color
 
 
-def Verificacion(matriz, matriz_correcta, ancho, alto):
-	for x in range(alto):
-		for y in range(ancho):
-			if matriz[x][y]['color'] == matriz_correcta[x][y]['color']:
-				matriz[x][y]['color'] = 'green'
-			else:
-				matriz[x][y]['color'] = 'red'
+def Verificacion(matriz, matriz_correcta, ancho, alto,orientacion):
+	if orientacion == 'Horizontal':
+		for x in range(alto):
+			for y in range(ancho):
+				if matriz[x][y]['color'] == matriz_correcta[x][y]['color']:
+					matriz[x][y]['color'] = 'green'
+				else:
+					matriz[x][y]['color'] = 'red'
+	else:
+		for x in range(ancho):
+			for y in range(alto):
+				if matriz[x][y]['color'] == matriz_correcta[x][y]['color']:
+					matriz[x][y]['color'] = 'green'
+				else:
+					matriz[x][y]['color'] = 'red'
 	return matriz
 
 
@@ -404,13 +423,18 @@ def Dibujar_sopa_final(matriz, color_de_fondo, orientacion, ancho, alto, BOX_SIZ
 		# Dibujo vertical
 		for row in range(ancho):
 			for col in range(alto):
-				letra = matriz[col][row]['letra']
-				color_actual = matriz[col][row]['color']
+				letra = matriz[row][col]['letra']
+				color_actual = matriz[row][col]['color']
 				g.DrawRectangle((col * BOX_SIZE, row * BOX_SIZE),
 								(col * BOX_SIZE + BOX_SIZE, row * BOX_SIZE + BOX_SIZE),
 								fill_color=color_actual, line_color='black', )
 
 				g.DrawText('{}'.format(letra), (col * BOX_SIZE + 13, row * BOX_SIZE + 13), font='Courier 25')
+
+	e,v=window.Read()
+
+	if e == 'Salir':
+		window.Close()
 
 
 def Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color_adjetivos, color_verbos, orientacion,
@@ -424,6 +448,7 @@ def Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color
 	ancho = (max(len(pal) for pal in palabras) + 3)
 	BOX_SIZE = 25
 	matriz = []
+	matriz_correcta= []
 
 
 	# Calculo de temperatura
@@ -480,6 +505,7 @@ def Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color
 		# Dibujo horizontal
 		for row in range(alto):
 			matriz.append([])
+			matriz_correcta.append([])
 			for col in range(ancho):
 				letra = palabras[row][col]
 				g.DrawRectangle((col * BOX_SIZE, row * BOX_SIZE),
@@ -488,7 +514,9 @@ def Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color
 
 				g.DrawText('{}'.format(letra), (col * BOX_SIZE + 13, row * BOX_SIZE + 13), font='Courier 25')
 				dic_casillero = {'letra': letra, 'color': color_actual}
+				d = {'letra': letra, 'color': color_actual}
 				matriz[row].append(dic_casillero)
+				matriz_correcta[row].append(d)
 
 	else:
 
@@ -508,6 +536,7 @@ def Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color
 		# Dibujo vertical
 		for row in range(ancho):
 			matriz.append([])
+			matriz_correcta.append([])
 			for col in range(alto):
 				letra = palabras[col][row]
 				g.DrawRectangle((col * BOX_SIZE, row * BOX_SIZE),
@@ -516,7 +545,9 @@ def Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color
 
 				g.DrawText('{}'.format(letra), (col * BOX_SIZE + 13, row * BOX_SIZE + 13), font='Courier 25')
 				dic_casillero = {'letra': letra, 'color': color_actual}
+				d = {'letra': letra, 'color': color_actual}
 				matriz[row].append(dic_casillero)
+				matriz_correcta[row].append(d)
 
 
 	color_actual= color_de_fondo[0]
@@ -553,10 +584,9 @@ def Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color
 					color_de_fondo)
 				window.UnHide()
 		elif event is 'Verificar':
-			matriz_correcta=colorear_matriz(matriz, sustantivos, adjetivos, verbos, palabras, color_sustantivos,
-							color_adjetivos,
-							color_verbos, orientacion)
-			matriz_resultante = Verificacion(matriz, matriz_correcta, ancho, alto)
+			colorear_matriz(matriz_correcta,matriz, sustantivos, adjetivos, verbos, palabras, color_sustantivos,
+							color_adjetivos,color_verbos, orientacion)
+			matriz_resultante = Verificacion(matriz, matriz_correcta, ancho, alto,orientacion)
 			Dibujar_sopa_final(matriz_resultante, color_de_fondo, orientacion, ancho, alto, BOX_SIZE)
 			break
 
@@ -585,11 +615,11 @@ def Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color
 						color_actual= ant
 			else:
 				if (box_x < alto and box_y < ancho):
-					if (matriz[box_x][box_y]['color'] == color_actual):
+					if (matriz[box_y][box_x]['color'] == color_actual):
 						ant= color_actual
 						color_actual = color_de_fondo[0]
 						cambio= True
-					matriz[box_x][box_y]['color'] = color_actual
+					matriz[box_y][box_x]['color'] = color_actual
 					g.DrawRectangle((box_x * BOX_SIZE, box_y * BOX_SIZE),
 									(box_x * BOX_SIZE + BOX_SIZE, box_y * BOX_SIZE + BOX_SIZE), line_color='black',
 									fill_color=color_actual)
@@ -605,8 +635,8 @@ def main():
 	oficinas = buscar_oficinas()
 
 	# Generacion de colores
-	colores = {'amarillo': 'yellow', 'azul': 'blue', 'gris': 'grey', 'rojo': 'red', 'verde': 'green',
-			   'violeta': 'meduimorchid'}
+	colores = {'amarillo': 'yellow', 'gris': 'grey', 'marron': 'brown', 'naranja': 'orange', 'verde': 'green',
+			   'violeta': 'purple'}
 	lista_colores = []
 	for color in colores:
 		lista_colores.append(color)
