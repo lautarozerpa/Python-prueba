@@ -248,10 +248,41 @@ def obtenerListaPalabras(cant_sustantivos, cant_adjetivos, cant_verbos):
 				ListaAdjetivos.append(d["Palabra"])
 			elif (d["Tipo"] == "Verbo"):
 				ListaVerbos.append(d["Palabra"])
-	ListaS = ListaSustantivos.copy()
-	ListaA = ListaAdjetivos.copy()
-	ListaV = ListaVerbos.copy()
-	for k in range(len(ListaS)+len(ListaA)+len(ListaV)):
+
+	#Actualizar cantidad de palabras
+	if (cant_sustantivos > len(ListaSustantivos)):
+		cant_sustantivos = len(ListaSustantivos)
+	if (cant_adjetivos > len(ListaAdjetivos)):
+		cant_adjetivos = len(ListaAdjetivos)
+	if (cant_verbos > len(ListaVerbos)):
+		cant_verbos = len(ListaVerbos)
+
+	#Tomar palabras
+	ListaS = []
+	ListaA = []
+	ListaV = []
+	for l in range(cant_sustantivos):
+		pal=random.choice(ListaSustantivos)
+		ListaS.append(pal)
+		ListaSustantivos.remove(pal)
+	for l in range(cant_adjetivos):
+		pal=random.choice(ListaAdjetivos)
+		ListaA.append(pal)
+		ListaAdjetivos.remove(pal)
+	for l in range(cant_verbos):
+		pal=random.choice(ListaVerbos)
+		ListaV.append(pal)
+		ListaVerbos.remove(pal)
+
+	for l in ListaS:
+		ListaSustantivos.append(l)
+	for l in ListaA:
+		ListaAdjetivos.append(l)
+	for l in ListaV:
+		ListaVerbos.append(l)
+
+	#Entrelazar palabras
+	for k in range(cant_verbos+cant_adjetivos+cant_sustantivos):
 		num=random.randint(0,2)
 		if num == 0 and ListaS:
 			pal = random.choice(ListaS)
@@ -279,7 +310,7 @@ def obtenerListaPalabras(cant_sustantivos, cant_adjetivos, cant_verbos):
 					pal = random.choice(ListaA)
 					palabras.append(pal)
 					ListaA.remove(pal)
-	return palabras, ListaSustantivos, ListaAdjetivos, ListaVerbos
+	return palabras, ListaSustantivos, ListaAdjetivos, ListaVerbos, str(cant_sustantivos), str(cant_adjetivos), str(cant_verbos)
 
 
 def CrearListaDefiniciones(lista):
@@ -666,16 +697,9 @@ def main():
 		ListaSustantivos = datos[1]
 		ListaAdjetivos = datos[2]
 		ListaVerbos = datos[3]
-
-		s = int(cant_sustantivos)
-		a = int(cant_adjetivos)
-		v = int(cant_verbos)
-		if (s > len(ListaSustantivos)):
-			cant_sustantivos = str(len(ListaSustantivos))
-		if (a > len(ListaAdjetivos)):
-			cant_adjetivos = str(len(ListaAdjetivos))
-		if (v > len(ListaVerbos)):
-			cant_verbos = str(len(ListaVerbos))
+		cant_sustantivos=datos[4]
+		cant_adjetivos=datos[5]
+		cant_verbos=datos[6]
 
 		# funcion sopa
 		Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color_adjetivos, color_verbos, orientacion,

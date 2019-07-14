@@ -28,5 +28,10 @@
         "Palabra": "auto",
         "Tipo": "Sustantivo",
         "Definicion": "' Si puedes, incorporala: ver como'"
+    },
+    {
+        "Palabra": "caminar",
+        "Tipo": "Verbo",
+        "Definicion": "' Si puedes, incorporala: ver como.'"
     }
 ]
