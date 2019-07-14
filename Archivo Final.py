@@ -200,8 +200,7 @@ def Opciones(oficinas, lista_colores):
 
 	bot, values = window.Read()
 	window.Close()
-
-	return values
+	return values,bot
 
 
 def agregar_eliminar():
@@ -642,44 +641,45 @@ def main():
 		lista_colores.append(color)
 
 	# funcion para configuracion
-	values = Opciones(oficinas, lista_colores)
-	cant_sustantivos = values[0]
-	cant_adjetivos = values[1]
-	cant_verbos = values[2]
-	color_sustantivos = colores[values[3]]
-	color_adjetivos = colores[values[4]]
-	color_verbos = colores[values[5]]
-	orientacion = values[6]
-	grafia = values[7]
-	oficina = values[8]
-	ayuda = values[9]
+	values, bot = Opciones(oficinas, lista_colores)
+	if bot is 'Ok':
+		cant_sustantivos = values[0]
+		cant_adjetivos = values[1]
+		cant_verbos = values[2]
+		color_sustantivos = colores[values[3]]
+		color_adjetivos = colores[values[4]]
+		color_verbos = colores[values[5]]
+		orientacion = values[6]
+		grafia = values[7]
+		oficina = values[8]
+		ayuda = values[9]
 
-	# Generacion de temperatura promedio
-	temp = calcular_promedio(oficina)
+		# Generacion de temperatura promedio
+		temp = calcular_promedio(oficina)
 
-	# Funcion para agregar o eliminar palabras
-	agregar_eliminar()
+		# Funcion para agregar o eliminar palabras
+		agregar_eliminar()
 
-	# Generacion de lista de palabras
-	datos = obtenerListaPalabras(int(cant_sustantivos), int(cant_adjetivos), int(cant_verbos))
-	palabras = datos[0]
-	ListaSustantivos = datos[1]
-	ListaAdjetivos = datos[2]
-	ListaVerbos = datos[3]
+		# Generacion de lista de palabras
+		datos = obtenerListaPalabras(int(cant_sustantivos), int(cant_adjetivos), int(cant_verbos))
+		palabras = datos[0]
+		ListaSustantivos = datos[1]
+		ListaAdjetivos = datos[2]
+		ListaVerbos = datos[3]
 
-	s = int(cant_sustantivos)
-	a = int(cant_adjetivos)
-	v = int(cant_verbos)
-	if (s > len(ListaSustantivos)):
-		cant_sustantivos = str(len(ListaSustantivos))
-	if (a > len(ListaAdjetivos)):
-		cant_adjetivos = str(len(ListaAdjetivos))
-	if (v > len(ListaVerbos)):
-		cant_verbos = str(len(ListaVerbos))
+		s = int(cant_sustantivos)
+		a = int(cant_adjetivos)
+		v = int(cant_verbos)
+		if (s > len(ListaSustantivos)):
+			cant_sustantivos = str(len(ListaSustantivos))
+		if (a > len(ListaAdjetivos)):
+			cant_adjetivos = str(len(ListaAdjetivos))
+		if (v > len(ListaVerbos)):
+			cant_verbos = str(len(ListaVerbos))
 
-	# funcion sopa
-	Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color_adjetivos, color_verbos, orientacion,
-		 grafia, ayuda, palabras, ListaSustantivos, ListaAdjetivos, ListaVerbos, temp)
+		# funcion sopa
+		Sopa(cant_sustantivos, cant_adjetivos, cant_verbos, color_sustantivos, color_adjetivos, color_verbos, orientacion,
+			 grafia, ayuda, palabras, ListaSustantivos, ListaAdjetivos, ListaVerbos, temp)
 
 
 if __name__ == '__main__':
